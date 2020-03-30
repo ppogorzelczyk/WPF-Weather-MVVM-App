@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WeatherApp.Model;
+using WeatherApp.ViewModel.Commands;
 using WeatherApp.ViewModel.Helpers;
 
 namespace WeatherApp.ViewModel
@@ -57,6 +58,10 @@ namespace WeatherApp.ViewModel
 
         #endregion
 
+        #region Commands
+        public SearchCommand SearchCommand { get; set; }
+        #endregion
+
         public async void MakeQuery()
         {
             var cities = await AccuWeatherHelper.GetCities(Query);
@@ -84,6 +89,8 @@ namespace WeatherApp.ViewModel
                     }
                 };
             }
+
+            SearchCommand = new SearchCommand(this);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
