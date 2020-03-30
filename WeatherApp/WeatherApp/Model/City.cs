@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WeatherApp.Models
+namespace WeatherApp.Model
 {
     public class Area
     {
