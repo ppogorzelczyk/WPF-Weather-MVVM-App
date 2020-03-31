@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -51,10 +52,17 @@ namespace WeatherApp.ViewModel
             set
             {
                 selectedCity = value;
-                OnPropertyChanged("SelectedCity");
+                if (selectedCity != null)
+                {
+                    OnPropertyChanged("SelectedCity");
+                    GetCurrentConditions();
+                }
             }
         }
         #endregion
+
+        //has to be initialize ONLY ONCE
+        public ObservableCollection<City> Cities { get; set; }
 
         #endregion
 
@@ -62,9 +70,22 @@ namespace WeatherApp.ViewModel
         public SearchCommand SearchCommand { get; set; }
         #endregion
 
+        private async void GetCurrentConditions()
+        {
+            Query = string.Empty;
+            CurrentConditions = await AccuWeatherHelper.GetCurrentConditions(selectedCity.Key);
+        }
+
         public async void MakeQuery()
         {
             var cities = await AccuWeatherHelper.GetCities(Query);
+            //make sure that cities are cleared
+            Cities.Clear();
+            foreach (var city in cities)
+            {
+                //add every single city to observable collection
+                Cities.Add(city);
+            }
         }
 
         public WeatherVM()
@@ -75,7 +96,7 @@ namespace WeatherApp.ViewModel
                 //initialize template data
                 SelectedCity = new City
                 {
-                    LocalizedName = "New York"
+                    //LocalizedName = "New York"
                 };
                 CurrentConditions = new CurrentConditions
                 {
@@ -84,13 +105,14 @@ namespace WeatherApp.ViewModel
                     {
                         Metric = new Units
                         {
-                            Value = 21
+                            Value = "21"
                         }
                     }
                 };
             }
 
             SearchCommand = new SearchCommand(this);
+            Cities = new ObservableCollection<City>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
